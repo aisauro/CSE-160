@@ -48,7 +48,39 @@ function drawVector(v, color) {
   ctx.moveTo(cx, cy);
   ctx.lineTo(cx + x, cy - y)
   ctx.strokeStyle = color;
-  ctx.stroke()
+  ctx.stroke();
+}
+
+function angleBetween(v1, v2) {
+  let dotProduct = Vector3.dot(v1, v2);
+  let mag1 = v1.magnitude();
+  let mag2 = v2.magnitude();
+
+  if (mag1 === 0 || mag2 === 0) {
+    console.log("One of the vectors has zero magnitude.");
+    return;
+  }
+
+  let cosTheta = dotProduct / (mag1 * mag2);
+  cosTheta = Math.min(1, Math.max(-1, cosTheta));  //LLM gave theta range [-1, 1]
+    
+  let angleRad = Math.acos(cosTheta);
+  let angleDeg = angleRad * 180 / Math.PI;
+  //return angleDeg.toFixed(2);
+  //return Math.round(angleDeg);
+  return angleDeg
+  //console.log("Angle:", angleDeg.toFixed(2));
+}
+
+function areaTriangle(v1, v2) {
+  let crossProduct = Vector3.cross(v1, v2);
+  if (crossProduct.magnitude() === 0) {
+    console.log("Vectors are collinear, no triangle area.");
+    return 0;
+  }  
+  let areaParallelogram = crossProduct.magnitude();
+  let areaTriangle = areaParallelogram / 2;
+  return areaTriangle;
 }
 
 function handleDrawOperationEvent() {
@@ -96,6 +128,12 @@ function handleDrawOperationEvent() {
       let v4 = new Vector3(v2.elements).div(scalar);
       drawVector(v3, "green");
       drawVector(v4, "green");
+  } else if (op === "angle") {
+    let angle = angleBetween(v1, v2)
+    console.log("Angle:", angle.toFixed(0));
+  } else if (op === "area") {
+    let area = areaTriangle(v1, v2);
+    console.log("Area of the triangle:", area.toFixed(1));
   } else if (op === "mag") {
     console.log("Magnitude of v1:", v1.magnitude());
     console.log("Magnitude of v2:", v2.magnitude());
