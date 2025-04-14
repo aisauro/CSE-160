@@ -226,3 +226,73 @@ function sendTextToHTML(text, htmlID){
   }
   htmlElm.innerHTML = text;
 }
+
+function drawMyTrianglePicture() {
+  // Clear the canvas first if needed
+  g_shapesList = []; // optional, if you want to clear old shapes
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  let d = 25.0;
+  let cX = 0;
+  let cY = 15;
+  /*
+  // Example triangle: [x1, y1, x2, y2, x3, y3]
+  // Use color and drawTriangle() to add each triangle
+  // Repeat this for every triangle in your hand-drawn scene
+
+  // Triangle 1
+  gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0); // red
+  drawTriangle([-0.5, 0.0, -0.3, 0.5, -0.1, 0.0]);
+
+  // Triangle 2
+  gl.uniform4f(u_FragColor, 0.0, 1.0, 0.0, 1.0); // green
+  drawTriangle([0.1, 0.0, 0.3, 0.5, 0.5, 0.0]);
+
+  // ... add the rest of your triangles here
+  */
+  // body
+  gl.uniform4f(u_FragColor, 1.0, 1.0, 1.0, 1.0); // white
+  //drawTriangle([0.1, 0.0, 0.3, 0.5, 0.5, 0.0]);
+  //drawTriangle([-12/d, 0/d, 12/d, 0/d, 0/d, 32/d]);
+  drawTriangle([-12/d, (0-cY)/d, 12/d, (0-cY)/d, cX/d, (32-cY)/d]);
+  drawTriangle([-12/d, (0-cY)/d, cX/d, (-6-cY)/d, 12/d, (0-cY)/d]);
+  //RIGHT
+  drawTriangle([3/d, (-4-cY)/d, 5/d, (-6-cY)/d, 12/d, (0-cY)/d]);
+  drawTriangle([12/d, (0-cY)/d, 5/d, (-6-cY)/d, 8/d, (-6-cY)/d]);
+  drawTriangle([12/d, (0-cY)/d, 8/d, (-6-cY)/d, 10/d, (-4-cY)/d]);
+  //LEFT
+  drawTriangle([-3/d, (-4-cY)/d, -5/d, (-6-cY)/d, -12/d, (0-cY)/d]);
+  drawTriangle([-12/d, (0-cY)/d, -5/d, (-6-cY)/d, -8/d, (-6-cY)/d]);
+  drawTriangle([-12/d, (0-cY)/d, -8/d, (-6-cY)/d, -10/d, (-4-cY)/d]);
+  //feet
+  // RIGHT
+  gl.uniform4f(u_FragColor, 1.0, 1.0, 0.0, 1.0); // yellow
+  drawTriangle([3/d, (-4-cY)/d, 2/d, (-8-cY)/d, 5/d, (-6-cY)/d]);
+  drawTriangle([5/d, (-6-cY)/d, 7/d, (-9-cY)/d, 8/d, (-6-cY)/d]);
+  drawTriangle([8/d, (-6-cY)/d, 12/d, (-7-cY)/d, 10/d, (-4-cY)/d]);
+  drawTriangle([3/d, (-4-cY)/d, 5/d, (-6-cY)/d, 5/d, (-3-cY)/d]);
+  drawTriangle([5/d, (-3-cY)/d, 5/d, (-6-cY)/d, 8/d, (-3-cY)/d]);
+  drawTriangle([8/d, (-3-cY)/d, 5/d, (-6-cY)/d, 8/d, (-6-cY)/d]);
+  drawTriangle([8/d, (-3-cY)/d, 8/d, (-6-cY)/d, 10/d, (-4-cY)/d]);
+  // LEFT
+  drawTriangle([-3/d, (-4-cY)/d, -2/d, (-8-cY)/d, -5/d, (-6-cY)/d]);
+  drawTriangle([-5/d, (-6-cY)/d, -7/d, (-9-cY)/d, -8/d, (-6-cY)/d]);
+  drawTriangle([-8/d, (-6-cY)/d, -12/d, (-7-cY)/d, -10/d, (-4-cY)/d]);
+  drawTriangle([-3/d, (-4-cY)/d, -5/d, (-6-cY)/d, -5/d, (-3-cY)/d]);
+  drawTriangle([-5/d, (-3-cY)/d, -5/d, (-6-cY)/d, -8/d, (-3-cY)/d]);
+  drawTriangle([-8/d, (-3-cY)/d, -5/d, (-6-cY)/d, -8/d, (-6-cY)/d]);
+  drawTriangle([-8/d, (-3-cY)/d, -8/d, (-6-cY)/d, -10/d, (-4-cY)/d]);
+
+  // wing
+  // RIGHT
+  gl.uniform4f(u_FragColor, 0.59, 0.29, 0.0, 1.0); // brown
+  drawTriangle([7/d, (13-cY)/d, 9/d, (5-cY)/d, 12/d, (0-cY)/d]);
+  drawTriangle([7/d, (13-cY)/d, 12/d, (0-cY)/d, 12/d, (14-cY)/d]);
+  drawTriangle([12/d, (14-cY)/d, 12/d, (0-cY)/d, 16/d, (3-cY)/d]);
+  drawTriangle([12/d, (14-cY)/d, 16/d, (3-cY)/d, 16/d, (8-cY)/d]);
+  // LEFT
+  gl.uniform4f(u_FragColor, 0.59, 0.29, 0.0, 1.0); // brown
+  drawTriangle([-7/d, (13-cY)/d, -9/d, (5-cY)/d, -12/d, (0-cY)/d]);
+  drawTriangle([-7/d, (13-cY)/d, -12/d, (0-cY)/d, -12/d, (14-cY)/d]);
+  drawTriangle([-12/d, (14-cY)/d, -12/d, (0-cY)/d, -16/d, (3-cY)/d]);
+  drawTriangle([-12/d, (14-cY)/d, -16/d, (3-cY)/d, -16/d, (8-cY)/d]);
+}

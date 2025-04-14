@@ -21,7 +21,28 @@ class Triangle{
 
     // Draw
     var d = this.size/200.0; // delta
-    drawTriangle( [xy[0], xy[1], xy[0]+d, xy[1], xy[0], xy[1]+d] );
+    /*
+    // Calculate the 3 vertices of an upward-pointing equilateral triangle
+    let x = xy[0];
+    let y = xy[1];
+    
+    let angle1 = 90 * Math.PI / 180;    // top vertex (pointing up)
+    let angle2 = 210 * Math.PI / 180;   // bottom left
+    let angle3 = 330 * Math.PI / 180;   // bottom right
+    
+    let x1 = x + d * Math.cos(angle1);
+    let y1 = y + d * Math.sin(angle1);
+
+    let x2 = x + d * Math.cos(angle2);
+    let y2 = y + d * Math.sin(angle2);
+
+    let x3 = x + d * Math.cos(angle3);
+    let y3 = y + d * Math.sin(angle3);
+    
+    drawTriangle([x1, y1, x2, y2, x3, y3]);
+    */
+    drawTriangle( [xy[0]-d, xy[1]-d, xy[0]+d, xy[1]-d, xy[0], xy[1]+d] );
+    //drawTriangle( [xy[0], xy[1], xy[0]+d, xy[1], xy[0], xy[1]+d] );
   }
   
 }
