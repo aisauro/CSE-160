@@ -263,6 +263,15 @@ function drawMyTrianglePicture() {
   drawTriangle([-3/d, (-4-cY)/d, -5/d, (-6-cY)/d, -12/d, (0-cY)/d]);
   drawTriangle([-12/d, (0-cY)/d, -5/d, (-6-cY)/d, -8/d, (-6-cY)/d]);
   drawTriangle([-12/d, (0-cY)/d, -8/d, (-6-cY)/d, -10/d, (-4-cY)/d]);
+  
+  // head
+  // RIGHT
+  drawTriangle([0/d, (32-cY)/d, 7/d, (13-cY)/d, 5/d, (27-cY)/d]);
+  drawTriangle([0/d, (32-cY)/d, 5/d, (27-cY)/d, 3/d, (31-cY)/d]);
+  // LEFT
+  drawTriangle([0/d, (32-cY)/d, -7/d, (13-cY)/d, -5/d, (27-cY)/d]);
+  drawTriangle([0/d, (32-cY)/d, -5/d, (27-cY)/d, -3/d, (31-cY)/d]);
+
   //feet
   // RIGHT
   gl.uniform4f(u_FragColor, 1.0, 1.0, 0.0, 1.0); // yellow
@@ -290,9 +299,53 @@ function drawMyTrianglePicture() {
   drawTriangle([12/d, (14-cY)/d, 12/d, (0-cY)/d, 16/d, (3-cY)/d]);
   drawTriangle([12/d, (14-cY)/d, 16/d, (3-cY)/d, 16/d, (8-cY)/d]);
   // LEFT
-  gl.uniform4f(u_FragColor, 0.59, 0.29, 0.0, 1.0); // brown
   drawTriangle([-7/d, (13-cY)/d, -9/d, (5-cY)/d, -12/d, (0-cY)/d]);
   drawTriangle([-7/d, (13-cY)/d, -12/d, (0-cY)/d, -12/d, (14-cY)/d]);
   drawTriangle([-12/d, (14-cY)/d, -12/d, (0-cY)/d, -16/d, (3-cY)/d]);
   drawTriangle([-12/d, (14-cY)/d, -16/d, (3-cY)/d, -16/d, (8-cY)/d]);
+  
+  // face
+  // RIGHT
+  drawTriangle([0/d, (27-cY)/d, 0/d, (21-cY)/d, 4/d, (28-cY)/d]);
+  drawTriangle([4/d, (28-cY)/d, 3/d, (27-cY)/d, 5/d, (27-cY)/d]);
+  drawTriangle([4/d, (28-cY)/d, 0/d, (21-cY)/d, 3/d, (22-cY)/d]);
+  drawTriangle([4/d, (23-cY)/d, 5/d, (23-cY)/d, 5.5/d, (24.5-cY)/d]);
+  drawTriangle([4/d, (28-cY)/d, 3/d, (22-cY)/d, 5.5/d, (24.5-cY)/d]);
+  drawTriangle([4/d, (28-cY)/d, 5.5/d, (24.5-cY)/d, 5/d, (27-cY)/d]);
+  // LEFT
+  drawTriangle([-0/d, (27-cY)/d, -0/d, (21-cY)/d, -4/d, (28-cY)/d]);
+  drawTriangle([-4/d, (28-cY)/d, -3/d, (27-cY)/d, -5/d, (27-cY)/d]);
+  drawTriangle([-4/d, (28-cY)/d, -0/d, (21-cY)/d, -3/d, (22-cY)/d]);
+  drawTriangle([-4/d, (23-cY)/d, -5/d, (23-cY)/d, -5.5/d, (24.5-cY)/d]);
+  drawTriangle([-4/d, (28-cY)/d, -3/d, (22-cY)/d, -5.5/d, (24.5-cY)/d]);
+  drawTriangle([-4/d, (28-cY)/d, -5.5/d, (24.5-cY)/d, -5/d, (27-cY)/d]);
+
+  // chin flaps
+  gl.uniform4f(u_FragColor, 1.0, 0.0, 0.0, 1.0); // red
+  // RIGHT
+  drawTriangle([1/d, (22-cY)/d, 1/d, (16-cY)/d, 2/d, (15-cY)/d]);
+  drawTriangle([1/d, (22-cY)/d, 2/d, (15-cY)/d, 3/d, (17-cY)/d]);
+  drawTriangle([1/d, (22-cY)/d, 3/d, (17-cY)/d, 2/d, (22-cY)/d]);
+  // LEFT
+  drawTriangle([-1/d, (22-cY)/d, -1/d, (16-cY)/d, -2/d, (15-cY)/d]);
+  drawTriangle([-1/d, (22-cY)/d, -2/d, (15-cY)/d, -3/d, (17-cY)/d]);
+  drawTriangle([-1/d, (22-cY)/d, -3/d, (17-cY)/d, -2/d, (22-cY)/d]);
+
+  // head flaps
+  drawTriangle([0/d, (35-cY)/d, 0/d, (31-cY)/d, 1/d, (32-cY)/d]);
+  drawTriangle([2/d, (33-cY)/d, 0/d, (31-cY)/d, 0/d, (27-cY)/d]);
+
+  // beak
+  gl.uniform4f(u_FragColor, 1.0, 0.65, 0.0, 1.0); // orange
+  drawTriangle([0/d, (25-cY)/d, -2/d, (24-cY)/d, 2/d, (24-cY)/d]);
+  drawTriangle([0/d, (23-cY)/d, 2/d, (24-cY)/d, -2/d, (24-cY)/d]);
+
+  // eyes
+  gl.uniform4f(u_FragColor, 0.0, 0.0, 0.0, 1.0); // black
+  // RIGHT
+  drawTriangle([4/d, (27-cY)/d, 3/d, (26-cY)/d, 4.5/d, (26-cY)/d]);
+  drawTriangle([4/d, (25-cY)/d, 4.5/d, (26-cY)/d, 3/d, (26-cY)/d]);
+  // LEFT
+  drawTriangle([-4/d, (27-cY)/d, -3/d, (26-cY)/d, -4.5/d, (26-cY)/d]);
+  drawTriangle([-4/d, (25-cY)/d, -4.5/d, (26-cY)/d, -3/d, (26-cY)/d]);
 }
