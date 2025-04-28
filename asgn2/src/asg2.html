@@ -23,7 +23,7 @@ as well as the other files in the zip folder.
     <!--
     <button type="button" id="green">Green</button>
     <button type="button" id="red">Red</button>
-    -->
+    
     <p>
     <button type="button" id="clearButton">Clear Canvas</button>
     <p>
@@ -41,19 +41,45 @@ as well as the other files in the zip folder.
     Green <input type="range" min="0" max="100" value="100" class="slider" id="greenSlide">
     <br>
     Blue <input type="range" min="0" max="100" value="100" class="slider" id="blueSlide">
-    
+    -->
     <p>
-    <b>Magenta </b> <input type="range" min="-45" max="45" value="0" class="slider" id="magentaSlide">
-    Animation:
-    <button type="button" id="animationMagentaOnButton">ON</button>
-    <button type="button" id="animationMagentaOffButton">OFF</button>
+    <h3>SWORDSCHICKEN</h3>
     <p>
-    <b>Yellow </b> <input type="range" min="-45" max="45" value="0" class="slider" id="yellowSlide">
-    Animation:
-    <button type="button" id="animationYellowOnButton">ON</button>
-    <button type="button" id="animationYellowOffButton">OFF</button>
+    <b>Neck Angle </b> <input type="range" id="neckSlide" min="-25" max="25" value="0" class="slider">
+    Peck Animation:
+    <button type="button" id="animationPeckOnButton">ON</button>
+    <button type="button" id="animationPeckOffButton">OFF</button>
+    <br>
+    <b>Head Yaw (Side/Side)</b> <input type="range" id="headSlide" min="-5" max="5" value="0" class="slider">
     <p>
-    <b>Camera Angle </b> <input type="range" min="0" max="90" value="5" class="slider" id="angleSlide">
+    <b>Left Wing Flap </b> <input type="range" id="leftWingSlide" min="-15" max="45" value="45" class="slider">
+    <br>
+    Wings Animation:
+    <button type="button" id="animationWingOnButton">ON</button>
+    <button type="button" id="animationWingOffButton">OFF</button>
+    <br>
+    <b>Right Wing Flap </b> <input type="range" id="rightWingSlide" min="-45" max="15" value="-45" class="slider">
+    <p>
+    <b>Left Leg Swing </b> <input type="range" id="leftLegSlide" min="-25" max="25" value="0" class="slider">
+    <br>
+    <b>Left Knee Bend </b> <input type="range" id="leftKneeSlide" min="-5" max="15" value="0" class="slider">
+    <p>
+    <b>Right Leg Swing </b> <input type="range" id="rightLegSlide" min="-25" max="25" value="0" class="slider">
+    <br>
+    <b>Right Knee Bend </b> <input type="range" id="rightKneeSlide" min="-5" max="15" value="0" class="slider">
+    <p>
+    <b>Sword Angle </b> <input type="range" id="swordSlide" min="-25" max="5" value="0" class="slider">
+    <!--Animation:
+    <button type="button" id="swordAnimationOnButton">ON</button>
+    <button type="button" id="swordAnimationOffButton">OFF</button>-->
+    <p>
+    <b>Global Camera Angle </b> 
+    <br>
+    X-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleXSlide">
+    <br>
+    Y-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleYSlide">
+    <br>
+    Z-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleZSlide">
     <p>
  
     <script src="../lib/webgl-utils.js"></script>
