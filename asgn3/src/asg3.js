@@ -343,6 +343,8 @@ function main() {
   //gl.clear(gl.COLOR_BUFFER_BIT);
   //renderAllShapes();
   requestAnimationFrame(tick);
+  // Start the animation loop
+  //animate();
 }
 
 var g_startTime=performance.now()/1000.0;
@@ -401,6 +403,105 @@ function keydown(ev) {
   renderAllShapes(); // re-render the scene
 }
 
+class Block {
+  constructor(textureType = 0, scale = 0.1) {
+    this.textureType = textureType;
+    this.color = [1, 1, 1, 1];  // Default color
+    this.texColorWeight = 0.5;   // Blending weight for texture/color
+    this.modelMatrix = new Matrix4();  // Transformation matrix
+    this.scale = scale;  // Block scale factor
+  }
+
+  render() {
+    this.modelMatrix.setIdentity();
+    this.modelMatrix.scale(this.scale, this.scale, this.scale);
+    gl.uniformMatrix4fv(u_ModelMatrix, false, this.modelMatrix.elements);
+    gl.uniform1i(u_whichTexture, this.textureType);
+    gl.uniform4f(u_FragColor, ...this.color);
+    this.drawCube();
+  }
+
+  drawCube() {
+    gl.bindVertexArray(this.cubeVAO);
+    gl.drawElements(gl.TRIANGLES, this.numElements, gl.UNSIGNED_SHORT, 0);
+  }
+}
+
+// World grid (map), each element can hold a stack of blocks
+let worldGrid = [];
+
+const MAP_WIDTH = 10;  // Width of the map
+const MAP_HEIGHT = 10; // Height of the map
+
+// Initialize the world grid
+for (let i = 0; i < MAP_WIDTH; i++) {
+  worldGrid[i] = [];
+  for (let j = 0; j < MAP_HEIGHT; j++) {
+    worldGrid[i][j] = []; // Empty stack of blocks at each position
+  }
+}
+
+// Camera position and direction (simplified for this example)
+let cameraPosition = { x: 5, y: 5, z: 5 };  // Example position in the middle of the grid
+let cameraDirection = { x: 0, y: 0, z: 1 }; // Camera facing along z-axis (forward)
+
+// Function to calculate the block in front of the camera
+function getBlockInFrontOfCamera() {
+  const frontX = cameraPosition.x + cameraDirection.x;
+  const frontY = cameraPosition.y + cameraDirection.y;
+  const frontZ = cameraPosition.z + cameraDirection.z;
+  
+  // Check if the coordinates are within the map bounds
+  if (frontX >= 0 && frontX < MAP_WIDTH && frontY >= 0 && frontY < MAP_HEIGHT) {
+    return worldGrid[frontX][frontY];  // Return the stack of blocks at the front position
+  }
+  return null;  // If out of bounds, return null
+}
+
+// Function to add a block at the position in front of the camera
+function addBlockInFront() {
+  const frontBlockStack = getBlockInFrontOfCamera();
+  if (frontBlockStack !== null) {
+    frontBlockStack.push(new Block(1)); // Add a new block with texture type 1 (example)
+  }
+}
+
+// Function to remove a block at the position in front of the camera
+function removeBlockInFront() {
+  const frontBlockStack = getBlockInFrontOfCamera();
+  if (frontBlockStack !== null && frontBlockStack.length > 0) {
+    frontBlockStack.pop();  // Remove the top block from the stack
+  }
+}
+
+// Key event listeners for adding/removing blocks
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'a') {
+    addBlockInFront();  // Add block when 'a' key is pressed
+  }
+  if (event.key === 'd') {
+    removeBlockInFront();  // Remove block when 'd' key is pressed
+  }
+});
+
+// Render the world with the blocks
+function renderWorld() {
+  for (let x = 0; x < MAP_WIDTH; x++) {
+    for (let y = 0; y < MAP_HEIGHT; y++) {
+      for (let z = 0; z < worldGrid[x][y].length; z++) {
+        let block = worldGrid[x][y][z];
+        block.render();  // Render each block in the stack
+      }
+    }
+  }
+}
+
+// Call renderWorld in your animation loop to continuously render the blocks
+function animate() {
+  renderWorld();  // Draw the world
+  requestAnimationFrame(animate);  // Keep animating
+}
+
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
   
@@ -438,6 +539,8 @@ function renderAllShapes(){
   sky.matrix.scale(500,500,500);
   sky.matrix.translate(-.5, -.5, -0.5);
   sky.render();
+
+  renderWorld();
   // Check the time at the end of the function, and show on web page
   var duration = performance.now() - startTime;
   sendTextToHTML(" ms: " + Math.floor(duration) + " fps: " + Math.floor(10000/duration)/10, "numdot");
