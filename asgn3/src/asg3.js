@@ -21,6 +21,7 @@ var FSHADER_SOURCE = `
   uniform vec4 u_FragColor;
   uniform sampler2D u_Sampler0;
   uniform sampler2D u_Sampler1;
+  uniform sampler2D u_Sampler2;
   uniform int u_whichTexture;
   uniform float u_texColorWeight; // t in blending formula
   void main() {
@@ -38,8 +39,10 @@ var FSHADER_SOURCE = `
       vec4 texColor = texture2D(u_Sampler0, v_UV);
       float t = u_texColorWeight;
       gl_FragColor = (1.0 - t) * baseColor + t * texColor;
-    } else if (u_whichTexture == 1) {
+    } else if (u_whichTexture == 1) {              // grass
       gl_FragColor = texture2D(u_Sampler1, v_UV);
+    } else if (u_whichTexture == 2) {              // stone
+      gl_FragColor = texture2D(u_Sampler2, v_UV);
     } else {                                       // Error, put Redish
       gl_FragColor = vec4(1,.2,.2,1);
     }
@@ -58,6 +61,7 @@ let u_ViewMatrix;
 let u_GlobalRotateMatrix;
 let u_Sampler0;
 let u_Sampler1;
+let u_Sampler2;
 let u_whichTexture;
 let u_texColorWeight;
 
@@ -153,6 +157,13 @@ function connectVariablesToGLSL(){
     return;
   }
 
+  // Get the storage location of u_Sampler2
+  u_Sampler2 = gl.getUniformLocation(gl.program, 'u_Sampler2');
+  if (!u_Sampler2) {
+    console.log('Failed to get the storage location of u_Sampler2');
+    return;
+  }
+
   // Set an initial value for this matrix to identity
   var identityM = new Matrix4();
   gl.uniformMatrix4fv(u_ModelMatrix, false, identityM.elements);
@@ -172,48 +183,15 @@ let g_selectedType=POINT;
 //let g_globalYAngle=0;
 //let g_globalZAngle=0;
 let g_globalAngle=0;
-let g_yellowAngle=0;
-let g_magentaAngle=0;
-let g_yellowAnimation=false;
-let g_magentaAnimation=false;
 let g_camera;
 
 // Set up actions for the HTML UI elements
 function addActionsForHtmlUI(){
-
-  // Button Events
-  // document.getElementById('clearButton').onclick = function() { g_shapesList=[]; renderAllShapes();};
-  document.getElementById('animationYellowOffButton').onclick = function() {g_yellowAnimation=false;};
-  document.getElementById('animationYellowOnButton').onclick = function() {g_yellowAnimation=true;};
-  document.getElementById('animationMagentaOffButton').onclick = function() {g_magentaAnimation=false;};
-  document.getElementById('animationMagentaOnButton').onclick = function() {g_magentaAnimation=true;};
-  //document.getElementById('swordAnimationOffButton').onclick = function() {g_swordAnimation=false;};
-  //document.getElementById('swordAnimationOnButton').onclick = function() {g_swordAnimation=true;};
-
-  // document.getElementById('pointButton').onclick = function() { g_selectedType=POINT};
-  // document.getElementById('triButton').onclick = function() { g_selectedType=TRIANGLE };
-  // document.getElementById('circleButton').onclick = function() { g_selectedType=CIRCLE};
   // MOUSE ROTATE CLICK AND DRAG
   canvas.addEventListener('mousedown', (event) => g_camera.onMouseDown(event));
   canvas.addEventListener('mousemove', (event) => g_camera.onMouseMove(event));
   canvas.addEventListener('mouseup', () => g_camera.onMouseUp());
   // Color Slider Events
-  // document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0] = this.value/100; });
-  // document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1] = this.value/100; });
-  // document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2] = this.value/100; });
-  document.getElementById('yellowSlide').addEventListener('mousemove', function() { g_yellowAngle = this.value; renderAllShapes();});
-  document.getElementById('magentaSlide').addEventListener('mousemove', function() { g_magentaAngle = this.value; renderAllShapes();});
-  //document.getElementById('neckSlide').addEventListener('mousemove', function() { g_neckAngle = this.value; renderAllShapes();});
-  //document.getElementById('headSlide').addEventListener('mousemove', function() { g_headYawAngle = this.value; renderAllShapes();});
-  // Correcting the right and left wing sliders
-  //document.getElementById('leftWingSlide').addEventListener('mousemove', function() { g_leftWingAngle = this.value; renderAllShapes(); });
-  //document.getElementById('rightWingSlide').addEventListener('mousemove', function() { g_rightWingAngle = this.value; renderAllShapes(); });
-  // Correcting the left and right leg sliders
-  //document.getElementById('leftLegSlide').addEventListener('mousemove', function() { g_leftLegAngle = this.value; renderAllShapes(); });
-  //document.getElementById('rightLegSlide').addEventListener('mousemove', function() { g_rightLegAngle = this.value; renderAllShapes(); });
-  //document.getElementById('leftKneeSlide').addEventListener('mousemove', function() { g_leftKneeAngle = this.value; renderAllShapes(); });
-  //document.getElementById('rightKneeSlide').addEventListener('mousemove', function() { g_rightKneeAngle = this.value; renderAllShapes(); });
-
 
   // Size Slider Events
   document.getElementById('angleSlide').addEventListener('mousemove', function() { g_globalAngle = this.value; renderAllShapes(); });
@@ -237,6 +215,11 @@ function initTextures() {
     console.log('Failed to create the image object');
     return false;
   }
+  var image3 = new Image();  // Create the image object
+  if (!image3) {
+    console.log('Failed to create the image object');
+    return false;
+  }
   // Register the event handler to be called on loading an image
   image1.onload = function(){ sendImageToTEXTURE0( image1); };
   // Tell the browser to load an image
@@ -245,6 +228,9 @@ function initTextures() {
   // Add more texture loading
   image2.onload = function() { sendImageToTEXTURE1( image2); };
   image2.src = 'grass2.png'
+
+  image3.onload = function() { sendImageToTEXTURE2( image3); };
+  image3.src = 'stone.jpg'
 
   return true;
 }
@@ -303,6 +289,33 @@ function sendImageToTEXTURE1(image) {
   console.log('finished loadTexture');
 }
 
+function sendImageToTEXTURE2(image) {
+  var texture = gl.createTexture();   // Create a texture object
+  if (!texture) {
+    console.log('Failed to create the texture object');
+    return false;
+  }
+
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // Flip the image's y axis
+  // Enable texture unit0
+  gl.activeTexture(gl.TEXTURE2);
+  // Bind the texture object to the target
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+
+  // Set the texture parameters
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  // Set the texture image
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
+  
+  // Set the texture unit 2 to the sampler
+  gl.uniform1i(u_Sampler2, 2);
+  
+  //gl.clear(gl.COLOR_BUFFER_BIT);   // Clear <canvas>
+
+  //gl.drawArrays(gl.TRIANGLE_STRIP, 0, n); // Draw the rectangle
+  console.log('finished loadTexture');
+}
+
 function main() {
 
   // Set up canvas and gl variables
@@ -341,7 +354,7 @@ function tick(){
   g_seconds=performance.now()/1000.0-g_startTime;
   //console.log(g_seconds);
   // Update Animation Angles
-  updateAnimationAngles();
+  //updateAnimationAngles();
   // Draw everything
   renderAllShapes();
   // Tell the browser to update again when it has time
