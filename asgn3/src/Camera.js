@@ -238,149 +238,72 @@ class Camera {
     // End the drag
     this.isDragging = false;
   }
-  /*
+
   checkCollisionAndSlide(desiredMove) {
-    const MARGIN = 0.19;  // how far from the cube face we stop
+    let CAMERA_RADIUS = 0.05;
+    // current camera XZ
+    const ex = this.eye.elements[0];
+    const ez = this.eye.elements[2];
 
-    // 1) full new position if we moved
-    const ex = this.eye.elements[0] + desiredMove.elements[0];
-    const ez = this.eye.elements[2] + desiredMove.elements[2];
+    // attempted new position
+    const nx = ex + desiredMove.elements[0];
+    const nz = ez + desiredMove.elements[2];
 
-    // 2) compute the direction signs
-    const sx = Math.sign(desiredMove.elements[0]);
-    const sz = Math.sign(desiredMove.elements[2]);
+    // helper: is (wx,wz) colliding?
+    const collides = (wx, wz) => {
+      const mx = Math.floor(wx / this.CUBE_SIZE + this.HALF_MAP_W);
+      const mz = Math.floor(wz / this.CUBE_SIZE + this.HALF_MAP_D);
+      if (mx < 0 || mx >= this.g_map.length || mz < 0 || mz >= this.g_map[0].length) 
+        return false;  // out of map = no block
+      return this.g_map[mx][mz] > 0;
+    };
 
-    // 3) apply margin along each axis for collision testing
-    const testX = ex + sx * MARGIN;
-    const testZ = ez + sz * MARGIN;
+    // test all four corners of camera’s square
+    const corners = [
+      [nx + CAMERA_RADIUS, nz + CAMERA_RADIUS],
+      [nx - CAMERA_RADIUS, nz + CAMERA_RADIUS],
+      [nx + CAMERA_RADIUS, nz - CAMERA_RADIUS],
+      [nx - CAMERA_RADIUS, nz - CAMERA_RADIUS],
+    ];
 
-    // 4) map‐cell of that test point
-    const fx = testX / this.CUBE_SIZE + this.HALF_MAP_W;
-    const fz = testZ / this.CUBE_SIZE + this.HALF_MAP_D;
-    const mx = Math.floor(fx);
-    const mz = Math.floor(fz);
-
-    // 5) out of bounds → no move
-    if (mx < 0 || mx >= this.g_map.length ||
-        mz < 0 || mz >= this.g_map[0].length) {
-      return new Vector3([0,0,0]);
-    }
-
-    // 6) if there’s a block there, we collide
-    if (this.g_map[mx][mz] > 0) {
-      // --- try X only ---
-      let canX = false;
-      if (desiredMove.elements[0] !== 0) {
-        const tx = this.eye.elements[0] + desiredMove.elements[0] + sx * MARGIN;
-        const tz = this.eye.elements[2];
-        const mxX = Math.floor(tx  / this.CUBE_SIZE + this.HALF_MAP_W);
-        const mzX = Math.floor(tz  / this.CUBE_SIZE + this.HALF_MAP_D);
-        if (
-          mxX >= 0 && mxX < this.g_map.length &&
-          mzX >= 0 && mzX < this.g_map[0].length &&
-          this.g_map[mxX][mzX] === 0
-        ) canX = true;
-      }
-
-      // --- try Z only ---
-      let canZ = false;
-      if (desiredMove.elements[2] !== 0) {
-        const tx = this.eye.elements[0];
-        const tz = this.eye.elements[2] + desiredMove.elements[2] + sz * MARGIN;
-        const mxZ = Math.floor(tx / this.CUBE_SIZE + this.HALF_MAP_W);
-        const mzZ = Math.floor(tz / this.CUBE_SIZE + this.HALF_MAP_D);
-        if (
-          mxZ >= 0 && mxZ < this.g_map.length &&
-          mzZ >= 0 && mzZ < this.g_map[0].length &&
-          this.g_map[mxZ][mzZ] === 0
-        ) canZ = true;
-      }
-
-      // return only the axes that are free
+    // if none of the corners collide, full move is fine
+    let blocked = corners.some(([wx, wz]) => collides(wx, wz));
+    if (!blocked) {
       return new Vector3([
-        canX ? desiredMove.elements[0] : 0,
-        0,
-        canZ ? desiredMove.elements[2] : 0
+        desiredMove.elements[0],
+        desiredMove.elements[1],
+        desiredMove.elements[2]
       ]);
     }
 
-    // 7) no block in the path → full move OK
+    // otherwise we’re blocked — try sliding on each axis separately:
+
+    // X-only attempt
+    const nxX = ex + desiredMove.elements[0];
+    const cornersX = [
+      [nxX + CAMERA_RADIUS, ez + CAMERA_RADIUS],
+      [nxX - CAMERA_RADIUS, ez + CAMERA_RADIUS],
+      [nxX + CAMERA_RADIUS, ez - CAMERA_RADIUS],
+      [nxX - CAMERA_RADIUS, ez - CAMERA_RADIUS],
+    ];
+    let blockedX = cornersX.some(([wx, wz]) => collides(wx, wz));
+
+    // Z-only attempt
+    const nzZ = ez + desiredMove.elements[2];
+    const cornersZ = [
+      [ex + CAMERA_RADIUS, nzZ + CAMERA_RADIUS],
+      [ex - CAMERA_RADIUS, nzZ + CAMERA_RADIUS],
+      [ex + CAMERA_RADIUS, nzZ - CAMERA_RADIUS],
+      [ex - CAMERA_RADIUS, nzZ - CAMERA_RADIUS],
+    ];
+    let blockedZ = cornersZ.some(([wx, wz]) => collides(wx, wz));
+
+    // Build the slide vector: allow axis that isn’t blocked
     return new Vector3([
-      desiredMove.elements[0],
-      desiredMove.elements[1],
-      desiredMove.elements[2]
+      blockedX ? 0 : desiredMove.elements[0],
+      0,
+      blockedZ ? 0 : desiredMove.elements[2]
     ]);
-  }
-  */
-  // inside your Camera class
-
-// How big around the camera we check (in world units)
-
-checkCollisionAndSlide(desiredMove) {
-  let CAMERA_RADIUS = 0.05;
-  // current camera XZ
-  const ex = this.eye.elements[0];
-  const ez = this.eye.elements[2];
-
-  // attempted new position
-  const nx = ex + desiredMove.elements[0];
-  const nz = ez + desiredMove.elements[2];
-
-  // helper: is (wx,wz) colliding?
-  const collides = (wx, wz) => {
-    const mx = Math.floor(wx / this.CUBE_SIZE + this.HALF_MAP_W);
-    const mz = Math.floor(wz / this.CUBE_SIZE + this.HALF_MAP_D);
-    if (mx < 0 || mx >= this.g_map.length || mz < 0 || mz >= this.g_map[0].length) 
-      return false;  // out of map = no block
-    return this.g_map[mx][mz] > 0;
-  };
-
-  // test all four corners of camera’s square
-  const corners = [
-    [nx + CAMERA_RADIUS, nz + CAMERA_RADIUS],
-    [nx - CAMERA_RADIUS, nz + CAMERA_RADIUS],
-    [nx + CAMERA_RADIUS, nz - CAMERA_RADIUS],
-    [nx - CAMERA_RADIUS, nz - CAMERA_RADIUS],
-  ];
-
-  // if none of the corners collide, full move is fine
-  let blocked = corners.some(([wx, wz]) => collides(wx, wz));
-  if (!blocked) {
-    return new Vector3([
-      desiredMove.elements[0],
-      desiredMove.elements[1],
-      desiredMove.elements[2]
-    ]);
-  }
-
-  // otherwise we’re blocked — try sliding on each axis separately:
-
-  // X-only attempt
-  const nxX = ex + desiredMove.elements[0];
-  const cornersX = [
-    [nxX + CAMERA_RADIUS, ez + CAMERA_RADIUS],
-    [nxX - CAMERA_RADIUS, ez + CAMERA_RADIUS],
-    [nxX + CAMERA_RADIUS, ez - CAMERA_RADIUS],
-    [nxX - CAMERA_RADIUS, ez - CAMERA_RADIUS],
-  ];
-  let blockedX = cornersX.some(([wx, wz]) => collides(wx, wz));
-
-  // Z-only attempt
-  const nzZ = ez + desiredMove.elements[2];
-  const cornersZ = [
-    [ex + CAMERA_RADIUS, nzZ + CAMERA_RADIUS],
-    [ex - CAMERA_RADIUS, nzZ + CAMERA_RADIUS],
-    [ex + CAMERA_RADIUS, nzZ - CAMERA_RADIUS],
-    [ex - CAMERA_RADIUS, nzZ - CAMERA_RADIUS],
-  ];
-  let blockedZ = cornersZ.some(([wx, wz]) => collides(wx, wz));
-
-  // Build the slide vector: allow axis that isn’t blocked
-  return new Vector3([
-    blockedX ? 0 : desiredMove.elements[0],
-    0,
-    blockedZ ? 0 : desiredMove.elements[2]
-  ]);
   }
 
 

@@ -17,7 +17,14 @@ as well as the other files in the zip folder.
     <canvas id="webgl" width="400" height="400">
     Please use a browser that supports "canvas"
     </canvas>
- 
+    <div id="dayMessage" style="position:absolute; top:10px; left:10px; color:white; font-size:16px;"></div>
+    <div id="warningMessage"
+      style="position:absolute; top:50%; left:50%;
+            transform:translate(-50%, -50%);
+            color:red; font-size:48px; font-weight:bold;
+            display:none; /* start hidden */">
+      ITS COMING
+    </div>
     <p id="numdot"> XXX </p>
     <p>
     Randomly generates world within 32x32 walled area
@@ -29,7 +36,11 @@ as well as the other files in the zip folder.
     Use j to remove blocks and k to place blocks depending on which
     stack of blocks you are looking at (almost clipping into)
     <br>
+    <b>There is a 40 second day-night cycle, 10 seconds for each and for transitioning</b>
+    <br>
     <b>It has collision detection, prevents you from just phasing through blocks (wow point/simple game)</b>
+    <br>
+    <b><div id="author" style=color:green;>There might be something out there. . . </b></div>
     </p>
   
     <b>Global Camera Angle </b> <input type="range" min="0" max="360" value="0" class="slider" id="angleSlide">
@@ -51,7 +62,7 @@ as well as the other files in the zip folder.
     <script src="Point.js"></script>
     <script src="Cube.js"></script>
     <script src="Camera.js"></script>
-    <script src="asg3.js"></script>
+    <script src="tester.js"></script>
   </body>
 </html>
  
