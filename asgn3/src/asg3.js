@@ -184,6 +184,23 @@ let g_selectedType=POINT;
 //let g_globalZAngle=0;
 let g_globalAngle=0;
 let g_camera;
+var g_map = [];
+for (let x = 0; x < 32; x++) {
+  g_map[x] = [];
+  for (let z = 0; z < 32; z++) {
+    // Create borders with height 3, rest flat
+    if (x == 0 || x == 31 || z == 0 || z == 31) {
+      g_map[x][z] = 3;
+    } else {
+      //g_map[x][z] = 0; // Interior space
+      //g_map[x][z] = Math.random() < 0.1 ? 1 : 0;
+      // Randomly decide the number of blocks to place at this position
+      // For example, values from 0 (no stack) to 3 (a higher stack)
+      g_map[x][z] = Math.random() < 0.3 ? Math.floor(Math.random() * 3) : 0;
+      // Random stack heights (0-3), adjust the probability (0.3 here means 30% chance to have a stack)
+    }
+  }
+}
 
 // Set up actions for the HTML UI elements
 function addActionsForHtmlUI(){
@@ -329,7 +346,8 @@ function main() {
   // Register function (event handler) to be called on a mouse press
   //canvas.onmousedown = click;//function(ev){ click(ev, gl, canvas, a_Position); };
   //canvas.onmousemove = function(ev) { if(ev.buttons == 1) { click(ev) } };
-  g_camera = new Camera(canvas);
+  //g_camera = new Camera(canvas);
+  g_camera = new Camera(canvas, g_map, CUBE_SIZE, HALF_MAP_W, HALF_MAP_D);
   //document.onkeydown = keydown;
   document.onkeydown = function(ev) { keydown(ev) };
   //document.addEventListener('keydown', keydown, false);
@@ -396,112 +414,213 @@ function keydown(ev) {
     case 69: // E
       g_camera.panRight(angle);
       break;
+    case 74: // J
+      removeBlock();
+      break;
+    case 75: // K
+      placeBlock();
+      break;
     default:
       return; // don't redraw if nothing happens
   }
   
   renderAllShapes(); // re-render the scene
 }
+/*
+var g_map = [
+[1,1,1,1,1,1,1,1],
+[1,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,1],
+[1,0,0,1,1,0,0,1],
+[1,0,0,0,0,0,0,1],
+[1,0,0,0,0,0,0,1],
+[1,0,0,0,0,1,0,1],
+[1,0,0,0,0,0,0,1],
+];
 
-class Block {
-  constructor(textureType = 0, scale = 0.1) {
-    this.textureType = textureType;
-    this.color = [1, 1, 1, 1];  // Default color
-    this.texColorWeight = 0.5;   // Blending weight for texture/color
-    this.modelMatrix = new Matrix4();  // Transformation matrix
-    this.scale = scale;  // Block scale factor
-  }
-
-  render() {
-    this.modelMatrix.setIdentity();
-    this.modelMatrix.scale(this.scale, this.scale, this.scale);
-    gl.uniformMatrix4fv(u_ModelMatrix, false, this.modelMatrix.elements);
-    gl.uniform1i(u_whichTexture, this.textureType);
-    gl.uniform4f(u_FragColor, ...this.color);
-    this.drawCube();
-  }
-
-  drawCube() {
-    gl.bindVertexArray(this.cubeVAO);
-    gl.drawElements(gl.TRIANGLES, this.numElements, gl.UNSIGNED_SHORT, 0);
-  }
-}
-
-// World grid (map), each element can hold a stack of blocks
-let worldGrid = [];
-
-const MAP_WIDTH = 10;  // Width of the map
-const MAP_HEIGHT = 10; // Height of the map
-
-// Initialize the world grid
-for (let i = 0; i < MAP_WIDTH; i++) {
-  worldGrid[i] = [];
-  for (let j = 0; j < MAP_HEIGHT; j++) {
-    worldGrid[i][j] = []; // Empty stack of blocks at each position
+function drawMap() {
+  var body = new Cube();
+  body.matrix.translate(0,-.75,0);
+  body.matrix.scale(.75,.75,.75);
+  for (x=0; x < 16;x++){
+    for (z=0; z < 16;z++){
+      if (x==0 || x==31 || z==0 || z==31){
+        //body = new Cube();
+        body.color = [0,0,0,1];
+        body.textureNum = 2;
+        //body.matrix.translate(0,-.75,0);
+        //body.matrix.scale(.5,.5,.5);
+        body.matrix.translate(x,0,z);
+        body.renderFast();
+      }
+    }
   }
 }
-
-// Camera position and direction (simplified for this example)
-let cameraPosition = { x: 5, y: 5, z: 5 };  // Example position in the middle of the grid
-let cameraDirection = { x: 0, y: 0, z: 1 }; // Camera facing along z-axis (forward)
-
-// Function to calculate the block in front of the camera
-function getBlockInFrontOfCamera() {
-  const frontX = cameraPosition.x + cameraDirection.x;
-  const frontY = cameraPosition.y + cameraDirection.y;
-  const frontZ = cameraPosition.z + cameraDirection.z;
-  
-  // Check if the coordinates are within the map bounds
-  if (frontX >= 0 && frontX < MAP_WIDTH && frontY >= 0 && frontY < MAP_HEIGHT) {
-    return worldGrid[frontX][frontY];  // Return the stack of blocks at the front position
-  }
-  return null;  // If out of bounds, return null
-}
-
-// Function to add a block at the position in front of the camera
-function addBlockInFront() {
-  const frontBlockStack = getBlockInFrontOfCamera();
-  if (frontBlockStack !== null) {
-    frontBlockStack.push(new Block(1)); // Add a new block with texture type 1 (example)
-  }
-}
-
-// Function to remove a block at the position in front of the camera
-function removeBlockInFront() {
-  const frontBlockStack = getBlockInFrontOfCamera();
-  if (frontBlockStack !== null && frontBlockStack.length > 0) {
-    frontBlockStack.pop();  // Remove the top block from the stack
+*/
+/*
+var g_map = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 2, 2, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [1, 0, 0, 0, 0, 3, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+];
+*/
+// Randomly generate 32x32 map
+/*
+function drawMap() {
+  for (let x = 0; x < g_map.length; x++) {
+    for (let z = 0; z < g_map[0].length; z++) {
+      let height = g_map[x][z]; // height = number of stacked cubes
+      for (let y = 0; y < height; y++) {
+        let wall = new Cube();
+        wall.color = [0.6, 0.6, 0.6, 1];
+        wall.textureNum = 2;  // Optional texture
+        wall.matrix.translate(0, -0.75, 0); // base alignment
+        wall.matrix.scale(0.75, 0.75, 0.75);
+        wall.matrix.translate(x - g_map.length / 2, y, z - g_map[0].length / 2);
+        wall.renderFast();
+      }
+    }
   }
 }
-
-// Key event listeners for adding/removing blocks
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'a') {
-    addBlockInFront();  // Add block when 'a' key is pressed
-  }
-  if (event.key === 'd') {
-    removeBlockInFront();  // Remove block when 'd' key is pressed
-  }
-});
-
-// Render the world with the blocks
-function renderWorld() {
-  for (let x = 0; x < MAP_WIDTH; x++) {
-    for (let y = 0; y < MAP_HEIGHT; y++) {
-      for (let z = 0; z < worldGrid[x][y].length; z++) {
-        let block = worldGrid[x][y][z];
-        block.render();  // Render each block in the stack
+*/
+//
+function drawMap() {
+  let wall = new Cube();  // Create only one cube object
+  wall.color = [0.6, 0.6, 0.6, 1];
+  wall.textureNum = 2;  // Optional texture
+  for (let x = 0; x < g_map.length; x++) {
+    for (let z = 0; z < g_map[0].length; z++) {
+      let height = g_map[x][z]; // number of stacked cubes at this (x, z)
+      for (let y = 0; y < height; y++) {
+        wall.matrix.setIdentity();  // Reset matrix for each cube
+        wall.matrix.translate(0, -0.75, 0); // base alignment
+        wall.matrix.scale(0.75, 0.75, 0.75);
+        wall.matrix.translate(
+          x - g_map.length / 2, 
+          y, 
+          z - g_map[0].length / 2
+        );
+        wall.renderFast();
       }
     }
   }
 }
 
-// Call renderWorld in your animation loop to continuously render the blocks
-function animate() {
-  renderWorld();  // Draw the world
-  requestAnimationFrame(animate);  // Keep animating
+const CUBE_SIZE    = 0.75;
+const HALF_MAP_W   = g_map.length  / 2;
+const HALF_MAP_D   = g_map[0].length / 2;
+const MAX_PICK_DIST = 6.0;
+const PICK_STEP     = 0.2;
+
+function isBlocked(x, z, cameraHeight = 1.0) {
+  const fx = x / CUBE_SIZE + HALF_MAP_W;
+  const fz = z / CUBE_SIZE + HALF_MAP_D;
+  const mx = Math.floor(fx);
+  const mz = Math.floor(fz);
+
+  if (mx < 0 || mx >= g_map.length || mz < 0 || mz >= g_map[0].length) return true;
+
+  const blockHeight = g_map[mx][mz] * CUBE_SIZE;
+  return cameraHeight <= blockHeight + 0.05;  // small offset to allow standing "on" blocks
 }
 
+
+function pickMapCell() {
+  // forward vector
+  let f = new Vector3(g_camera.at.elements);
+  f.sub(g_camera.eye);
+  f.normalize();
+
+  for (let d = PICK_STEP; d <= MAX_PICK_DIST; d += PICK_STEP) {
+    let wx = g_camera.eye.elements[0] + f.elements[0] * d;
+    let wz = g_camera.eye.elements[2] + f.elements[2] * d;
+
+    // invert the draw‐map transform:
+    let fx = wx / CUBE_SIZE + HALF_MAP_W;
+    let fz = wz / CUBE_SIZE + HALF_MAP_D;
+    let mx = Math.floor(fx);
+    let mz = Math.floor(fz);
+
+    if (mx >= 0 && mx < g_map.length &&
+        mz >= 0 && mz < g_map[0].length) {
+      return { mapX: mx, mapZ: mz };
+    }
+  }
+  return null;
+}
+/*
+function placeBlock() {
+  const cell = pickMapCell();
+  if (!cell) return;
+  const MAX_H = 10;
+  if (g_map[cell.mapX][cell.mapZ] < MAX_H)
+    g_map[cell.mapX][cell.mapZ]++;
+}
+*/
+function placeBlock() {
+  const cell = pickMapCell();
+  if (!cell) return;
+
+  const MAX_H = 10;
+  const { mapX, mapZ } = cell;
+
+  // 1) Place the block
+  if (g_map[mapX][mapZ] < MAX_H) {
+    g_map[mapX][mapZ]++;
+
+    // 2) If camera is now inside, push out radially
+    const camY = g_camera.eye.elements[1];
+    let x = g_camera.eye.elements[0], z = g_camera.eye.elements[2];
+    if (isBlocked(x, z, camY)) {
+      // Compute block center in world coords
+      const centerX = (mapX - HALF_MAP_W + 0.5) * CUBE_SIZE;
+      const centerZ = (mapZ - HALF_MAP_D + 0.5) * CUBE_SIZE;
+
+      // Direction from block center → camera
+      let dx = x - centerX,
+          dz = z - centerZ;
+      let len = Math.hypot(dx, dz) || 1;
+      dx /= len; dz /= len;
+
+      // Start just outside the cube’s face (half‐width), then step out
+      const startDist = CUBE_SIZE * 0.5 + 0.001;
+      const STEP = 0.05;
+      const MAX_STEPS = 20;
+
+      for (let i = 0; i < MAX_STEPS; i++) {
+        const testDist = startDist + i * STEP;
+        const testX = centerX + dx * testDist;
+        const testZ = centerZ + dz * testDist;
+        if (!isBlocked(testX, testZ, camY)) {
+          // Found a free spot—apply the offset
+          const ox = testX - x;
+          const oz = testZ - z;
+          g_camera.eye.elements[0] += ox;
+          g_camera.eye.elements[2] += oz;
+          g_camera.at.elements[0]  += ox;
+          g_camera.at.elements[2]  += oz;
+          g_camera.updateViewMatrix();
+          return;
+        }
+      }
+      console.warn("Might be trapped in block, remove by pressing j");
+    }
+  }
+}
+
+function removeBlock() {
+  const cell = pickMapCell();
+  if (!cell) return;
+  if (g_map[cell.mapX][cell.mapZ] > 0)
+    g_map[cell.mapX][cell.mapZ]--;
+}
+
+//
 //Draw every shape that is supposed to be in the canvas
 function renderAllShapes(){
   
@@ -521,16 +640,16 @@ function renderAllShapes(){
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.clear(gl.COLOR_BUFFER_BIT );
-
+  drawMap();
   // Draw the floor
   var floor = new Cube();
   floor.color = [1.0,0.0,0.0,1.0];
   floor.textureNum=1;
-  floor.matrix.translate(0, -.75, 0.0);
-  floor.matrix.scale(100, 0.01, 100);
+  floor.matrix.translate(-25, -.75, 0.0);
+  floor.matrix.scale(50, 0.01, 50);
   floor.matrix.rotate(320,1,0,0);
   //floor.matrix.translate(-.5, 0, 0.5);
-  floor.render();
+  floor.renderFast();
 
   // Draw the sky
   var sky = new Cube();
@@ -538,9 +657,8 @@ function renderAllShapes(){
   sky.textureNum=-2;
   sky.matrix.scale(500,500,500);
   sky.matrix.translate(-.5, -.5, -0.5);
-  sky.render();
+  sky.renderFast();
 
-  renderWorld();
   // Check the time at the end of the function, and show on web page
   var duration = performance.now() - startTime;
   sendTextToHTML(" ms: " + Math.floor(duration) + " fps: " + Math.floor(10000/duration)/10, "numdot");
