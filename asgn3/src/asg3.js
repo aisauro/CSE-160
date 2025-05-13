@@ -21,29 +21,28 @@ var FSHADER_SOURCE = `
   uniform sampler2D u_Sampler1;
   uniform sampler2D u_Sampler2;
   uniform int u_whichTexture;
-  uniform float u_texColorWeight; // t in blending formula
+  uniform float u_texColorWeight;
+  uniform float u_darkness;            // NEW
   void main() {
+    vec4 base;
     if (u_whichTexture == -2) {
-      gl_FragColor = u_FragColor;                  // Use color
-
-    } else if (u_whichTexture == -1) {             // Use UV debug color
-      gl_FragColor = vec4(v_UV,1.0,1.0);
-
-    } else if (u_whichTexture == 0) {              // Use texture0
-      gl_FragColor = texture2D(u_Sampler0, v_UV);
-
-    } else if (u_whichTexture == -3) {  // linear interpolation
-      vec4 baseColor = u_FragColor;
+      base = u_FragColor;
+    } else if (u_whichTexture == -1) {
+      base = vec4(v_UV,1.0,1.0);
+    } else if (u_whichTexture == 0) {
+      base = texture2D(u_Sampler0, v_UV);
+    } else if (u_whichTexture == -3) {
       vec4 texColor = texture2D(u_Sampler0, v_UV);
-      float t = u_texColorWeight;
-      gl_FragColor = (1.0 - t) * baseColor + t * texColor;
-    } else if (u_whichTexture == 1) {              // grass
-      gl_FragColor = texture2D(u_Sampler1, v_UV);
-    } else if (u_whichTexture == 2) {              // stone
-      gl_FragColor = texture2D(u_Sampler2, v_UV);
-    } else {                                       // Error, put Redish
-      gl_FragColor = vec4(1,.2,.2,1);
+      base = mix(u_FragColor, texColor, u_texColorWeight);
+    } else if (u_whichTexture == 1) {
+      base = texture2D(u_Sampler1, v_UV);
+    } else if (u_whichTexture == 2) {
+      base = texture2D(u_Sampler2, v_UV);
+    } else {
+      base = vec4(1.0,0.2,0.2,1.0);
     }
+    // Blend towards black based on time of day
+    gl_FragColor = mix(base, vec4(0.0,0.0,0.0,1.0), u_darkness);
   }`
 
 //Global Variables
@@ -159,6 +158,13 @@ function connectVariablesToGLSL(){
   u_Sampler2 = gl.getUniformLocation(gl.program, 'u_Sampler2');
   if (!u_Sampler2) {
     console.log('Failed to get the storage location of u_Sampler2');
+    return;
+  }
+
+  // Get the storage location of u_darkness
+  u_darkness = gl.getUniformLocation(gl.program, 'u_darkness');
+  if (!u_darkness) {
+    console.log('Failed to get the storage location of u_darkness');
     return;
   }
 
@@ -365,29 +371,52 @@ function main() {
 
 var g_startTime=performance.now()/1000.0;
 var g_seconds=performance.now()/1000.0-g_startTime;
+let g_cycleTime   = 0.0;    // seconds into the cycle
+const g_cycleLen  = 40.0;   // 10s day,10s dusk,10s night,10s dawn
+const MAX_DARKNESS = 0.8; // maximum “darkness” you want at full night (0 = no dark, 1 = pitch-black)
+let u_darkness;             // will hold the uniform location
 
-// Called by browser repeatedly whenever its time
-function tick(){
-  // Save the current time
-  g_seconds=performance.now()/1000.0-g_startTime;
-  //console.log(g_seconds);
-  // Update Animation Angles
-  //updateAnimationAngles();
-  // Draw everything
-  renderAllShapes();
-  // Tell the browser to update again when it has time
-  requestAnimationFrame(tick);
+function tick() {
+    g_cycleTime = (performance.now() / 1000.0) % g_cycleLen;
+
+   let darkness, message;
+    if (g_cycleTime < 10.0) {
+        darkness = 0.0;
+        message   = "It is day";
+    } else if (g_cycleTime < 20.0) {
+        darkness = (g_cycleTime - 10.0) / 10.0 * MAX_DARKNESS;
+        message   = "Night is approaching";
+    } else if (g_cycleTime < 30.0) {
+        darkness = MAX_DARKNESS;
+        message   = "Night has fallen";
+    } else {
+        darkness = (1.0 - ((g_cycleTime - 30.0) / 10.0)) * MAX_DARKNESS;
+        message   = "The night is ending";
+   }
+
+    // Send darkness to shader
+    gl.uniform1f(u_darkness, darkness);
+
+    // Update on-screen message
+    document.getElementById('dayMessage').innerText = message;
+
+    // == NEW: warning flash ==
+    const warningEl = document.getElementById('warningMessage');
+    if (message === "Night has fallen") {
+        const phaseTime = g_cycleTime - 20.0;                // 0→10s in night
+        const flashOn  = Math.floor(phaseTime * 2) % 2 === 0; 
+        warningEl.style.display = flashOn ? 'block' : 'none';
+    } else {
+        warningEl.style.display = 'none';
+    }
+
+    // Draw your scene
+    renderAllShapes();
+
+    // Loop
+    requestAnimationFrame(tick);
 }
 
-// Update the angles of everything if currently animated
-function updateAnimationAngles() {
-  if (g_yellowAnimation) {
-    g_yellowAngle = (45*Math.sin(g_seconds));
-  }
-  if (g_magentaAnimation) {
-    g_magentaAngle = (45*Math.sin(3*g_seconds));
-  }
-}
 
 function keydown(ev) {
   const speed = 0.1;     // movement speed
