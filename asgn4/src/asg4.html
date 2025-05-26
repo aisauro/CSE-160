@@ -1,0 +1,91 @@
+<!-- 
+Alonso Isauro
+aisauro@ucsc.edu
+
+Notes to Grader:
+Used lab, assignment videos, and LLM to create this program 
+as well as the other files in the zip folder.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Assignment 4: Lighting (Medium)</title>
+  </head>
+ 
+  <body onload="main()">
+    <canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>
+    <!--
+    <div id="dayMessage" style="position:absolute; top:10px; left:10px; color:white; font-size:16px;"></div>
+    <div id="warningMessage"
+      style="position:absolute; top:50%; left:50%;
+            transform:translate(-50%, -50%);
+            color:red; font-size:48px; font-weight:bold;
+            display:none; /* start hidden */">
+      ITS COMING
+    </div>
+    -->
+    <p id="numdot"> XXX </p>
+    Normals:
+    <button type="button" id="normalOn">Normal on</button>
+    <button type="button" id="normalOff">Normal off</button>
+    <p>
+
+    <p>
+    Light X <input type="range" min="-250" max="250" value="0" class="slider" id="lightSlideX">
+    Light Y <input type="range" min="-250" max="250" value="100" class="slider" id="lightSlideY">
+    Light Z <input type="range" min="-250" max="250" value="-200" class="slider" id="lightSlideZ">
+    </p>
+    <p>
+    <label>Light Color:</label><br>
+    R: <input type="range" id="lightR" min="0" max="100" value="100"><br>
+    G: <input type="range" id="lightG" min="0" max="100" value="100"><br>
+    B: <input type="range" id="lightB" min="0" max="100" value="100"><br>
+    </p>
+    Light:
+    <button type="button" id="lightOn">ON</button>
+    <button type="button" id="lightOff">OFF</button>
+    <p>
+    Move with wasd and pan left or right with qe
+    <br>
+    Click and drag with mouse to rotate camera on yaw.
+    <br>
+    <!--
+    Randomly generates world within 32x32 walled area
+    <br>
+    Use j to remove blocks and k to place blocks depending on which
+    stack of blocks you are looking at (almost clipping into)
+    <br>
+    <b>There is a 40 second day-night cycle, 10 seconds for each and for transitioning</b>
+    <br>
+    <b>It has collision detection, prevents you from just phasing through blocks (wow point/simple game)</b>
+    <br>
+    <b><div id="author" style=color:green;>There might be something out there. . . </b></div>
+    </p>
+    -->
+    <b>Global Camera Angle </b> <input type="range" min="0" max="360" value="0" class="slider" id="angleSlide">
+    <!--
+    X-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleXSlide">
+    <br>
+    Y-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleYSlide">
+    <br>
+    Z-Axis <input type="range" min="0" max="360" value="0" class="slider" id="angleZSlide">
+    <p>
+    -->
+ 
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="Circle.js"></script>
+    <script src="Point.js"></script>
+    <script src="Sphere.js"></script>
+    <script src="Cube.js"></script>
+    <script src="Camera.js"></script>
+    <script src="asg4.js"></script>
+  </body>
+</html>
+ 
