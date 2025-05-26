@@ -616,7 +616,7 @@ function renderAllShapes(){
   
   // Draw Sphere
   var sp = new Sphere();
-  sp.color = [0.9,0.9,0.9,1.0];
+  sp.color = [0.8,0.8,0.8,1.0];
   sp.textureNum=-2;
   if (g_normalOn) sp.textureNum=3;
   sp.matrix.translate(0,-1.3,-6);
