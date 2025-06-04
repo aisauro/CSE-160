@@ -1,0 +1,40 @@
+<!-- 
+Alonso Isauro
+aisauro@ucsc.edu
+
+Notes to Grader:
+Used lab, assignment videos, and LLM to create this program 
+as well as the other files in the zip folder.
+ -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Assignment 5: Exploring a High-Level Graphics Library (Medium)</title>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@v0.176.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.176.0/examples/jsm/"
+      }
+    }
+    </script>
+
+  </head>
+ 
+  <body>
+    <canvas id="c" width="800" height="400"></canvas>
+    <script type="module" src="asg5.js"></script>
+    <!--<canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>-->
+    <p>
+    Textured, skybox included, custom obj model with textures.  Camera controls with mouse dragging
+    </p>
+    Also included three lights, ambient, directional, and spotlight near origin.
+    <br>
+    Used code from tutorials
+  </body>
+</html>
+ 
