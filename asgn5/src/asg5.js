@@ -312,86 +312,104 @@ function main() {
 
 	} );
 
-	function randomColor() {
-		return new THREE.Color(Math.random(), Math.random(), Math.random());
-	}
-
-	function randomPosition4UnitsAway() {
-		// Helper to pick a random value either in [-10, -4] or [4, 10]
-		function randomAxis() {
-			const range1 = -10;
-			const range2 = -4;
-			const range3 = 4;
-			const range4 = 10;
-			if (Math.random() < 0.5) {
-			return range1 + Math.random() * (range2 - range1);
-			} else {
-			return range3 + Math.random() * (range4 - range3);
-			}
-		}
-		return { x: randomAxis(), z: randomAxis() };
-	}
-
-	function createStickFigure(x, z, color) {
-		const group = new THREE.Group();
-
-		// Head
-		const headGeo = new THREE.SphereGeometry(0.2, 16, 16);
-		const headMat = new THREE.MeshPhongMaterial({ color });
-		const head = new THREE.Mesh(headGeo, headMat);
-		head.position.set(0, 1.6, 0);
-		group.add(head);
-
-		// Body
-		const bodyGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.8);
-		const bodyMat = new THREE.MeshPhongMaterial({ color });
-		const body = new THREE.Mesh(bodyGeo, bodyMat);
-		body.position.set(0, 1.0, 0);
-		group.add(body);
-
-		// Left Arm
-		const armGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.6);
-		const armMat = new THREE.MeshPhongMaterial({ color });
-		const leftArm = new THREE.Mesh(armGeo, armMat);
-		leftArm.position.set(-0.25, 1.3, 0);
-		leftArm.rotation.z = Math.PI / 4;
-		group.add(leftArm);
-
-		// Right Arm
-		const rightArm = new THREE.Mesh(armGeo, armMat);
-		rightArm.position.set(0.25, 1.3, 0);
-		rightArm.rotation.z = -Math.PI / 4;
-		group.add(rightArm);
-
-		// Left Leg
-		const legGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.7);
-		const legMat = new THREE.MeshPhongMaterial({ color });
-		const leftLeg = new THREE.Mesh(legGeo, legMat);
-		leftLeg.position.set(-0.15, 0.3, 0);
-		leftLeg.rotation.z = -Math.PI / 12;
-		group.add(leftLeg);
-
-		// Right Leg
-		const rightLeg = new THREE.Mesh(legGeo, legMat);
-		rightLeg.position.set(0.15, 0.3, 0);
-		rightLeg.rotation.z = Math.PI / 12;
-		group.add(rightLeg);
-
-		// Position the whole figure on the ground
-		group.position.set(x, -1.47, z);
-
-		stickFigureGroup.add(group);
-	}
-
-	// Create a group for all stick figures
+	// === STICK FIGURE GROUP ===
 	const stickFigureGroup = new THREE.Group();
 	scene.add(stickFigureGroup);
 
-	// Generate 20 stick figures with random colors and positions
-	for(let i = 0; i < 25; i++) {
-		const pos = randomPosition4UnitsAway();
-		const color = randomColor();
-		createStickFigure(pos.x, pos.z, color);
+	// === HELPER FUNCTIONS ===
+
+	// Random position at least 4 units away from origin on x,z plane
+	function randomPosition4UnitsAway() {
+	const radius = 4 + Math.random() * 6; // between 4 and 10 units away
+	const angle = Math.random() * Math.PI * 2;
+	return {
+		x: Math.cos(angle) * radius,
+		z: Math.sin(angle) * radius
+	};
+	}
+
+	// Random bright color
+	function randomColor() {
+	return new THREE.Color().setHSL(Math.random(), 0.7, 0.5);
+	}
+
+	// === CREATE STICK FIGURE FUNCTION ===
+	function createStickFigure(x, z, color) {
+	const group = new THREE.Group();
+
+	// Head
+	const headGeo = new THREE.SphereGeometry(0.2, 16, 16);
+	const headMat = new THREE.MeshPhongMaterial({ color });
+	const head = new THREE.Mesh(headGeo, headMat);
+	head.position.set(0, 1.6, 0);
+	group.add(head);
+
+	// Body
+	const bodyGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.8);
+	const bodyMat = new THREE.MeshPhongMaterial({ color });
+	const body = new THREE.Mesh(bodyGeo, bodyMat);
+	body.position.set(0, 1.0, 0);
+	group.add(body);
+
+	// Left Arm
+	const armGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.6);
+	const leftArmMat = new THREE.MeshPhongMaterial({ color });
+	const leftArm = new THREE.Mesh(armGeo, leftArmMat);
+	leftArm.position.set(-0.25, 1.3, 0);
+	leftArm.rotation.z = Math.PI / 4;
+	group.add(leftArm);
+
+	// Right Arm
+	const rightArmMat = new THREE.MeshPhongMaterial({ color });
+	const rightArm = new THREE.Mesh(armGeo, rightArmMat);
+	rightArm.position.set(0.25, 1.3, 0);
+	rightArm.rotation.z = -Math.PI / 4;
+	group.add(rightArm);
+
+	// Left Leg
+	const legGeo = new THREE.CylinderGeometry(0.07, 0.07, 0.7);
+	const leftLegMat = new THREE.MeshPhongMaterial({ color });
+	const leftLeg = new THREE.Mesh(legGeo, leftLegMat);
+	leftLeg.position.set(-0.15, 0.3, 0);
+	leftLeg.rotation.z = -Math.PI / 12;
+	group.add(leftLeg);
+
+	// Right Leg
+	const rightLegMat = new THREE.MeshPhongMaterial({ color });
+	const rightLeg = new THREE.Mesh(legGeo, rightLegMat);
+	rightLeg.position.set(0.15, 0.3, 0);
+	rightLeg.rotation.z = Math.PI / 12;
+	group.add(rightLeg);
+
+	// Position the entire figure
+	group.position.set(x, -1.47, z);
+
+	// Add group to stick figure group in scene
+	stickFigureGroup.add(group);
+
+	// Return references and animation params for use in animation
+	return {
+		group,
+		headMat,
+		bodyMat,
+		leftArm,
+		rightArm,
+		leftLeg,
+		rightLeg,
+		armSpeed: Math.random() * 2 + 1,    // speed for arms swinging
+		legSpeed: Math.random() * 2 + 1.5,  // speed for legs swinging
+		colorPhase: Math.random() * Math.PI * 2, // starting phase for color cycling
+	};
+	}
+
+	// === CREATE AND STORE ALL DANCING FIGURES ===
+	const dancingFigures = [];
+
+	for (let i = 0; i < 25; i++) {
+	const pos = randomPosition4UnitsAway();
+	const color = randomColor();
+	const figure = createStickFigure(pos.x, pos.z, color);
+	dancingFigures.push(figure);
 	}
 
 
@@ -407,6 +425,33 @@ function main() {
 			cube.rotation.y = rot;
 
 		} );
+
+		// Animate stick figures
+		dancingFigures.forEach(fig => {
+			// Arms swing back and forth with sine wave
+			const armAngle = Math.sin(time * fig.armSpeed) * 0.7;
+			fig.leftArm.rotation.z = Math.PI / 4 + armAngle;
+			fig.rightArm.rotation.z = -Math.PI / 4 - armAngle;
+
+			// Legs swing out of phase with arms
+			const legAngle = Math.sin(time * fig.legSpeed + Math.PI) * 0.5;
+			fig.leftLeg.rotation.z = -Math.PI / 12 + legAngle;
+			fig.rightLeg.rotation.z = Math.PI / 12 - legAngle;
+			/*
+			// Update color cycling over time
+			fig.colorPhase += 0.01;
+			const h = (fig.colorPhase % (Math.PI * 2)) / (Math.PI * 2);
+			const newColor = new THREE.Color().setHSL(h, 0.7, 0.5);
+
+			// Apply new color to all figure parts
+			fig.headMat.color.copy(newColor);
+			fig.bodyMat.color.copy(newColor);
+			fig.leftArm.material.color.copy(newColor);
+			fig.rightArm.material.color.copy(newColor);
+			fig.leftLeg.material.color.copy(newColor);
+			fig.rightLeg.material.color.copy(newColor);
+			*/
+		});
 
 		renderer.render( scene, camera );
 
